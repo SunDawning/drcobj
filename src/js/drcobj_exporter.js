@@ -69,7 +69,7 @@ THREE.DrcobjExporter.prototype = {
 
       var geometryBufferByteLength = drcGeometries[i].byteLength;
 
-      jsonData.geometries[i].data = { byteLength: geometryBufferByteLength };
+      jsonData.geometries[i].data = { offset: sumGeometryBuffersByteLength, byteLength: geometryBufferByteLength };
 
       sumGeometryBuffersByteLength += geometryBufferByteLength;
 
