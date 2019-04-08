@@ -89,7 +89,7 @@ THREE.DrcobjExporter.prototype = {
 
     modelDataSize[0] = jsonDataBuffer.byteLength;
 
-    modelData.set(jsonDataBuffer);
+    modelData.set(new Uint8Array(jsonDataBuffer));
 
     for (let i = 0, offset = 0; i < drcGeometries.length; i++) {
 
