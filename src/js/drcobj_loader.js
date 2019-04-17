@@ -52,10 +52,14 @@ THREE.DrcobjLoader.prototype = {
 
   parse: function (buffer, onLoad) {
 
+    var self = this;
+
     THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
 
-    var dracoLoader = new THREE.DRACOLoader();
-    var objectLoader = new THREE.ObjectLoader();
+    if (self.dracoLoader === undefined) {
+      self.dracoLoader = new THREE.DRACOLoader();
+      self.objectLoader = new THREE.ObjectLoader();
+    }
 
     var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
     var modelData = new Uint8Array(buffer, 4, modelDataSize);
@@ -73,7 +77,7 @@ THREE.DrcobjLoader.prototype = {
 
       var geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
 
-      dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
+      self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
 
         jsonData.geometries[i].data = geometry.toJSON().data;
 
@@ -89,7 +93,7 @@ THREE.DrcobjLoader.prototype = {
 
         clearInterval(timer);
 
-        onLoad(objectLoader.parse(jsonData));
+        onLoad(self.objectLoader.parse(jsonData));
 
       }
 
