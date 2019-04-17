@@ -123,9 +123,11 @@ THREE.DrcobjExporter.prototype = {
         for (let j = 0; j < normals.length; j++) { normals[j] = normals[j].toFixed(accuracyLevel); }
       }
 
-      if (uvs !== undefined) {
-        for (let j = 0; j < uvs.length; j++) { uvs[j] = uvs[j].toFixed(accuracyLevel); }
-      }
+      try {
+        if (uvs !== undefined) {
+          for (let j = 0; j < uvs.length; j++) { uvs[j] = uvs[j].toFixed(accuracyLevel); }
+        }
+      } catch (err) { console.log(err); }
 
     }
 
