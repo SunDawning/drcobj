@@ -113,7 +113,6 @@ THREE.DrcobjExporter.prototype = {
 
       var vertices = attributes.position.array;
       var normals = attributes.normal.array;
-      var uvs = attributes.uv.array;
 
       if (vertices !== undefined) {
         for (let j = 0; j < vertices.length; j++) { vertices[j] = vertices[j].toFixed(accuracyLevel); }
@@ -124,9 +123,13 @@ THREE.DrcobjExporter.prototype = {
       }
 
       try {
+
+        var uvs = attributes.uv.array;
+
         if (uvs !== undefined) {
           for (let j = 0; j < uvs.length; j++) { uvs[j] = uvs[j].toFixed(accuracyLevel); }
         }
+
       } catch (err) { console.log(err); }
 
     }
