@@ -55,7 +55,7 @@ THREE.DrcobjExporter.prototype = {
     // Reduce geometries accuracy
     // Omit unnecessary decimal places
 
-    jsonData = this.reduceGeometriesAccuracy(jsonData);
+    // jsonData = this.reduceGeometriesAccuracy(jsonData);
 
     // Convert all geometry to draco geometry buffer
 
