@@ -33,7 +33,7 @@ THREE.DrcobjExporter.prototype = {
 
   constructor: THREE.DrcobjExporter,
 
-  parse: function (object) {
+  parse: function (object, options) {
 
     var outputDataBuffer;
 
@@ -59,7 +59,7 @@ THREE.DrcobjExporter.prototype = {
 
     // Convert all geometry to draco geometry buffer
 
-    var drcGeometries = this.drcParse(jsonData);
+    var drcGeometries = this.drcParse(jsonData, options);
 
     // Save all converted draco geometry buffer byte lengths to the model data and calculate the sum
 
@@ -105,51 +105,28 @@ THREE.DrcobjExporter.prototype = {
 
   },
 
-  reduceGeometriesAccuracy: function (jsonData, accuracyLevel = 2) {
-
-    for (let i = 0; i < jsonData.geometries.length; i++) {
-
-      var attributes = jsonData.geometries[i].data.attributes;
-
-      var vertices = attributes.position.array;
-      var normals = attributes.normal.array;
-
-      if (vertices !== undefined) {
-        for (let j = 0; j < vertices.length; j++) { vertices[j] = vertices[j].toFixed(accuracyLevel); }
-      }
-
-      if (normals !== undefined) {
-        for (let j = 0; j < normals.length; j++) { normals[j] = normals[j].toFixed(accuracyLevel); }
-      }
-
-      try {
-
-        var uvs = attributes.uv.array;
-
-        if (uvs !== undefined) {
-          for (let j = 0; j < uvs.length; j++) { uvs[j] = uvs[j].toFixed(accuracyLevel); }
-        }
-
-      } catch (err) { console.log(err); }
-
-    }
-
-    return jsonData;
-
-  },
-
-  drcParse: function (jsonData) {
+  drcParse: function (jsonData, options) {
 
     var drcGeometries = [];
 
     var dracoExporter = new THREE.DRACOExporter();
     var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
+    var options = {};
+
+    if (options.decodeSpeed === undefined) { options.decodeSpeed = 5; }
+    if (options.encodeSpeed === undefined) { options.encodeSpeed = 5; }
+    if (options.encoderMethod === undefined) { options.encoderMethod = THREE.DRACOExporter.MESH_EDGEBREAKER_ENCODING; }
+    if (options.quantization === undefined) { options.quantization = [16, 8, 8, 8, 8]; }
+    if (options.exportUvs === undefined) { options.exportUvs = true; }
+    if (options.exportNormals === undefined) { options.exportNormals = true; }
+    if (options.exportColor === undefined) { options.exportColor = false; }
+
     for (let i = 0; i < jsonData.geometries.length; i++) {
 
       var geometry = bufferGeometryLoader.parse(jsonData.geometries[i]);
 
-      var drcGeometry = dracoExporter.parse(geometry);
+      var drcGeometry = dracoExporter.parse(geometry, options);
 
       drcGeometries.push(drcGeometry);
 
