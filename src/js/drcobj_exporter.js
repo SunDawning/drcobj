@@ -112,7 +112,7 @@ THREE.DrcobjExporter.prototype = {
     var dracoExporter = new THREE.DRACOExporter();
     var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
-    var options = {};
+    if (options === undefined) { options = {}; }
 
     if (options.decodeSpeed === undefined) { options.decodeSpeed = 5; }
     if (options.encodeSpeed === undefined) { options.encodeSpeed = 5; }
