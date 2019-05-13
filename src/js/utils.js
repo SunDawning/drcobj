@@ -99,13 +99,7 @@ var ImportLoader = function () {
 
           } catch (error) { return; }
 
-          objectLoader.parse(data, function (object) {
-
-            var json = object.toJSON();
-
-            saveArrayBuffer(drcobjExporter.parse(json, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
-
-          });
+          saveArrayBuffer(drcobjExporter.parse(data, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
 
         }, false);
 
