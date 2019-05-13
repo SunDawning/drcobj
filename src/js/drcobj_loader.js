@@ -31,8 +31,8 @@ THREE.DrcobjLoader = function (manager) {
 
   this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
 
-  this.dracoLoader = (dracoLoader !== undefined) ? dracoLoader : (new THREE.DRACOLoader());
-  this.objectLoader = (objectLoader !== undefined) ? objectLoader : (new THREE.ObjectLoader());
+  this.dracoLoader = new THREE.DRACOLoader();
+  this.objectLoader = new THREE.ObjectLoader();
 
 };
 
