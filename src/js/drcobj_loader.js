@@ -28,7 +28,12 @@
 'use strict';
 
 THREE.DrcobjLoader = function (manager) {
+
   this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
+
+  this.dracoLoader = (dracoLoader !== undefined) ? dracoLoader : (new THREE.DRACOLoader());
+  this.objectLoader = (objectLoader !== undefined) ? objectLoader : (new THREE.ObjectLoader());
+
 };
 
 THREE.DrcobjLoader.prototype = {
@@ -39,6 +44,19 @@ THREE.DrcobjLoader.prototype = {
 
     var self = this;
 
+    var extractUrlBase = function (url) {
+
+      var index = url.lastIndexOf("/");
+
+      if (index === - 1) return "./";
+
+      return url.substr(0, index + 1);
+
+    };
+
+    var path = (this.path === undefined) ? extractUrlBase(url) : this.path;
+    self.setResourcePath(path);
+
     var fileLoader = new THREE.FileLoader(self.manager);
     fileLoader.setPath(self.path);
     fileLoader.setResponseType("arraybuffer");
@@ -47,7 +65,16 @@ THREE.DrcobjLoader.prototype = {
   },
 
   setPath: function (value) {
+
     this.path = value;
+
+  },
+
+  setResourcePath: function (value) {
+
+    this.resourcePath = value;
+    this.objectLoader.setResourcePath(value);
+
   },
 
   parse: function (buffer, onLoad) {
@@ -55,11 +82,6 @@ THREE.DrcobjLoader.prototype = {
     var self = this;
 
     THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
-
-    if (self.dracoLoader === undefined) {
-      self.dracoLoader = new THREE.DRACOLoader();
-      self.objectLoader = new THREE.ObjectLoader();
-    }
 
     var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
     var modelData = new Uint8Array(buffer, 4, modelDataSize);
@@ -102,3 +124,4 @@ THREE.DrcobjLoader.prototype = {
   }
 
 };
+
