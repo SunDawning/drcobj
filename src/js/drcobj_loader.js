@@ -70,7 +70,6 @@ THREE.DrcobjLoader.prototype = {
   setResourcePath: function (value) {
 
     this.resourcePath = value;
-    this.objectLoader.setResourcePath(value);
 
   },
 
@@ -79,7 +78,9 @@ THREE.DrcobjLoader.prototype = {
     var self = this;
 
     var dracoLoader = new THREE.DRACOLoader();
+
     var objectLoader = new THREE.ObjectLoader();
+    objectLoader.setResourcePath(self.resourcePath);
 
     THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
 
