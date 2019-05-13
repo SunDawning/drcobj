@@ -33,7 +33,7 @@ THREE.DrcobjExporter.prototype = {
 
   constructor: THREE.DrcobjExporter,
 
-  parse: function (object, options) {
+  parse: function (json, options) {
 
     var outputDataBuffer;
 
@@ -48,23 +48,19 @@ THREE.DrcobjExporter.prototype = {
 
     };
 
-    // parse
-
-    var jsonData = object.toJSON();
-
     // Convert all geometry to draco geometry buffer
 
-    var drcGeometries = this.drcParse(jsonData, options);
+    var drcGeometries = this.drcParse(json, options);
 
     // Save all converted draco geometry buffer byte lengths to the model data and calculate the sum
 
     var sumGeometryBuffersByteLength = 0;
 
-    for (let i = 0; i < jsonData.geometries.length; i++) {
+    for (let i = 0; i < json.geometries.length; i++) {
 
       var geometryBufferByteLength = drcGeometries[i].byteLength;
 
-      jsonData.geometries[i].data = { offset: sumGeometryBuffersByteLength, byteLength: geometryBufferByteLength };
+      json.geometries[i].data = { offset: sumGeometryBuffersByteLength, byteLength: geometryBufferByteLength };
 
       sumGeometryBuffersByteLength += geometryBufferByteLength;
 
@@ -72,19 +68,19 @@ THREE.DrcobjExporter.prototype = {
 
     // Convert model json data to byte array
 
-    var jsonDataBuffer = stringToByteArray(JSON.stringify(jsonData));
+    var jsonBuffer = stringToByteArray(JSON.stringify(json));
 
     // Create an output data buffer and write data
 
-    outputDataBuffer = new ArrayBuffer(4 + jsonDataBuffer.byteLength + sumGeometryBuffersByteLength);
+    outputDataBuffer = new ArrayBuffer(4 + jsonBuffer.byteLength + sumGeometryBuffersByteLength);
 
     var modelDataSize = new Uint32Array(outputDataBuffer, 0, 1);
-    var modelData = new Uint8Array(outputDataBuffer, 4, jsonDataBuffer.byteLength);
-    var modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonDataBuffer.byteLength, sumGeometryBuffersByteLength);
+    var modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
+    var modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
 
-    modelDataSize[0] = jsonDataBuffer.byteLength;
+    modelDataSize[0] = jsonBuffer.byteLength;
 
-    modelData.set(new Uint8Array(jsonDataBuffer));
+    modelData.set(new Uint8Array(jsonBuffer));
 
     for (let i = 0, offset = 0; i < drcGeometries.length; i++) {
 
@@ -100,7 +96,7 @@ THREE.DrcobjExporter.prototype = {
 
   },
 
-  drcParse: function (jsonData, options) {
+  drcParse: function (json, options) {
 
     var drcGeometries = [];
 
@@ -117,9 +113,9 @@ THREE.DrcobjExporter.prototype = {
     if (options.exportNormals === undefined) { options.exportNormals = true; }
     if (options.exportColor === undefined) { options.exportColor = false; }
 
-    for (let i = 0; i < jsonData.geometries.length; i++) {
+    for (let i = 0; i < json.geometries.length; i++) {
 
-      var geometry = bufferGeometryLoader.parse(jsonData.geometries[i]);
+      var geometry = bufferGeometryLoader.parse(json.geometries[i]);
 
       var drcGeometry = dracoExporter.parse(geometry, options);
 

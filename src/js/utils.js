@@ -101,7 +101,9 @@ var ImportLoader = function () {
 
           objectLoader.parse(data, function (object) {
 
-            saveArrayBuffer(drcobjExporter.parse(object, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+            var json = object.toJSON();
+
+            saveArrayBuffer(drcobjExporter.parse(json, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
 
           });
 
