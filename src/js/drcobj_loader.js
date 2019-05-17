@@ -125,4 +125,3 @@ THREE.DrcobjLoader.prototype = {
   }
 
 };
-
