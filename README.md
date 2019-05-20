@@ -6,7 +6,11 @@ You can use **drcobj_exporter.js** to convert a threejs-object (.json) file to a
 
 ## How to use
 
-```javascript
+```html
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.0-pre/src/vendor/draco_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.0-pre/src/vendor/drace_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.0-pre/src/js/drcobj_loader.js"></script>
+
 var drcobjLoader = new THREE.DrcobjLoader();
 
 drcobjLoader.load("test.drcobj", function (object) {
