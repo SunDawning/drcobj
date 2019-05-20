@@ -11,6 +11,8 @@ You can use **drcobj_exporter.js** to convert a threejs-object (.json) file to a
 <script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.0-pre/src/vendor/drace_loader.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.0-pre/src/js/drcobj_loader.js"></script>
 
+<script>
+
 var drcobjLoader = new THREE.DrcobjLoader();
 
 drcobjLoader.load("test.drcobj", function (object) {
@@ -19,4 +21,5 @@ drcobjLoader.load("test.drcobj", function (object) {
 
 });
 
+</script>
 ```
