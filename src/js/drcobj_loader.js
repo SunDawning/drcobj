@@ -125,3 +125,9 @@ THREE.DrcobjLoader.prototype = {
   }
 
 };
+
+THREE.DrcobjLoader.release = function () {
+
+  THREE.DRACOLoader.releaseDecoderModule();
+
+};
