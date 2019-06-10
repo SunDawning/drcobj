@@ -48,37 +48,11 @@ var ImportLoader = function () {
 
   self.loadFiles = function (files) {
 
-    if (files.length > 0) {
-
-      var filesMap = createFileMap(files);
-
-      var manager = new THREE.LoadingManager();
-
-      manager.setURLModifier(function (url) {
-
-        var file = filesMap[url];
-
-        if (file) {
-
-          return URL.createObjectURL(file);
-
-        }
-
-        return url;
-
-      });
-
-      for (var i = 0; i < files.length; i++) {
-
-        self.loadFile(files[i], manager);
-
-      }
-
-    }
+    if (files.length > 0) { for (var i = 0; i < files.length; i++) { self.loadFile(files[i]); } }
 
   };
 
-  self.loadFile = function (file, manager) {
+  self.loadFile = function (file) {
 
     var filename = file.name;
     var extension = filename.split(".").pop().toLowerCase();
@@ -87,25 +61,7 @@ var ImportLoader = function () {
 
     switch (extension) {
 
-      case "json":
-
-        reader.addEventListener("load", function (event) {
-
-          var data, contents = event.target.result;
-
-          try {
-
-            data = JSON.parse(contents);
-
-          } catch (error) { return; }
-
-          saveArrayBuffer(drcobjExporter.parse(data, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
-
-        }, false);
-
-        reader.readAsText(file);
-
-        break;
+      case "json": loadJsonHandler(file); break;
 
       default: break;
 
@@ -113,19 +69,23 @@ var ImportLoader = function () {
 
   };
 
-  function createFileMap(files) {
+  function loadJsonHandler(file) {
 
-    var map = {};
+    var filename = file.name;
 
-    for (var i = 0; i < files.length; i++) {
+    reader.addEventListener("load", function (event) {
 
-      var file = files[i];
-      map[file.name] = file;
+      var data, contents = event.target.result;
 
-    }
+      try { data = JSON.parse(contents); } catch (error) { return; }
 
-    return map;
+      saveArrayBuffer(drcobjExporter.parse(data, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+
+    }, false);
+
+    reader.readAsText(file);
 
   }
 
 };
+
