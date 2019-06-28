@@ -57,6 +57,7 @@ var ImportExportHandler = function () {
 
     switch (extension) {
 
+      case "fbx": loadFbxHandler(file); break;
       case "json": loadJsonHandler(file); break;
 
       default: break;
@@ -80,6 +81,24 @@ var ImportExportHandler = function () {
     }, false);
 
     reader.readAsText(file);
+
+  }
+
+  function loadFbxHandler(file) {
+
+    var filename = file.name;
+
+    reader.addEventListener("load", function (event) {
+
+      var data, contents = event.target.result;
+
+      data = (new THREE.FBXLoader()).parse(contents).toJSON();
+
+      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, { quantization: [16, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+
+    }, false);
+
+    reader.readAsArrayBuffer(file);
 
   }
 
