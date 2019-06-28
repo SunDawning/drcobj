@@ -1,4 +1,4 @@
-// Import
+// 导入 Import
 var form = document.createElement("form");
 document.body.appendChild(form);
 
@@ -7,14 +7,14 @@ fileInput.type = "file";
 
 fileInput.addEventListener("change", function (event) {
 
-  importLoader.loadFiles(fileInput.files);
+  (new ImportExportHandler()).loadFiles(fileInput.files);
   form.reset();
 
 });
 
 form.appendChild(fileInput);
 
-// Export
+// 导出 Export
 var link = document.createElement("a");
 link.style.display = "none";
 document.body.appendChild(link);
@@ -39,12 +39,10 @@ function saveString(text, filename) {
 
 }
 
-// ImportLoader
-var ImportLoader = function () {
+// 导入导出处理 ImportExportHandler
+var ImportExportHandler = function () {
 
-  var self = this;
-
-  self.object = null;
+  var self = this, reader = new FileReader();
 
   self.loadFiles = function (files) {
 
@@ -56,8 +54,6 @@ var ImportLoader = function () {
 
     var filename = file.name;
     var extension = filename.split(".").pop().toLowerCase();
-
-    var reader = new FileReader();
 
     switch (extension) {
 
@@ -79,7 +75,7 @@ var ImportLoader = function () {
 
       try { data = JSON.parse(contents); } catch (error) { return; }
 
-      saveArrayBuffer(drcobjExporter.parse(data, { quantization: [20, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, { quantization: [16, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
 
     }, false);
 
@@ -88,4 +84,3 @@ var ImportLoader = function () {
   }
 
 };
-
