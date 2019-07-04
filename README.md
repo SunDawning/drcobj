@@ -19,7 +19,7 @@ var drcobjLoader = new THREE.DrcobjLoader();
 
 drcobjLoader.load("test.drcobj", function (object) {
 
-    screen.add(object);
+    scene.add(object);
 
 });
 
