@@ -1,5 +1,8 @@
 # Draco 3D Object
 
+![releases](https://img.shields.io/badge/releases-0.9.3--PRE-blue.svg?style=flat-square)
+![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
+
 ### [简体中文](https://github.com/Ouyang-Zhaoxing/drcobj/blob/master/README_CN.md)
 
 Draco is an open-source library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
