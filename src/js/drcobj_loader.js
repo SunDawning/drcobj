@@ -37,7 +37,7 @@ THREE.DrcobjLoader.prototype = {
 
   constructor: THREE.DrcobjLoader,
 
-  load: function (url, onLoad, onProgress, onError) {
+  load: function (url, onLoad, onProgress, onDecodeProgress, onError) {
 
     var self = this;
 
@@ -57,7 +57,7 @@ THREE.DrcobjLoader.prototype = {
     var fileLoader = new THREE.FileLoader(self.manager);
     fileLoader.setPath(self.path);
     fileLoader.setResponseType("arraybuffer");
-    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad); }, onProgress, onError);
+    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
 
   },
 
@@ -73,7 +73,7 @@ THREE.DrcobjLoader.prototype = {
 
   },
 
-  parse: function (buffer, onLoad) {
+  parse: function (buffer, onLoad, onDecodeProgress) {
 
     var self = this;
 
@@ -111,6 +111,8 @@ THREE.DrcobjLoader.prototype = {
     }
 
     var timer = setInterval(() => {
+
+      onDecodeProgress(finishCount / jsonData.geometries.length * 100);
 
       if (finishCount === jsonData.geometries.length) {
 
