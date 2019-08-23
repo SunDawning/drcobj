@@ -106,23 +106,21 @@ THREE.DrcobjLoader.prototype = {
 
         ++finishCount;
 
+        if (onDecodeProgress !== undefined) {
+
+          onDecodeProgress(finishCount / jsonData.geometries.length * 100);
+
+        }
+
+        if (finishCount === jsonData.geometries.length) {
+
+          onLoad(objectLoader.parse(jsonData));
+
+        }
+
       });
 
     }
-
-    var timer = setInterval(() => {
-
-      onDecodeProgress(finishCount / jsonData.geometries.length * 100);
-
-      if (finishCount === jsonData.geometries.length) {
-
-        clearInterval(timer);
-
-        onLoad(objectLoader.parse(jsonData));
-
-      }
-
-    }, 50);
 
   }
 
