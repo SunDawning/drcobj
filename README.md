@@ -14,9 +14,9 @@ You can use **drcobj_exporter.js** to convert a threejs-object (.json) file to a
 ### drcobj_loader:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/vendor/draco_decoder.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/vendor/draco_loader.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/js/drcobj_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/vendor/draco_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/vendor/draco_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/js/drcobj_loader.js"></script>
 
 <script>
 

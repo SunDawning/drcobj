@@ -14,9 +14,9 @@ Draco是一个用于压缩和解压缩3D几何网格和点云的开源库。它�
 ### drcobj_loader:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/vendor/draco_decoder.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/vendor/draco_loader.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.3.1-pre/src/js/drcobj_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/vendor/draco_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/vendor/draco_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.4-pre/src/js/drcobj_loader.js"></script>
 
 <script>
 
