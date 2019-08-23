@@ -1,4 +1,4 @@
-// 导入 Import
+/* Import */
 var form = document.createElement("form");
 document.body.appendChild(form);
 
@@ -6,62 +6,54 @@ var fileInput = document.createElement("input");
 fileInput.type = "file";
 
 fileInput.addEventListener("change", function (event) {
-
   (new ImportExportHandler()).loadFiles(fileInput.files);
   form.reset();
-
 });
 
 form.appendChild(fileInput);
 
-// 导出 Export
+/* Export */
 var link = document.createElement("a");
 link.style.display = "none";
 document.body.appendChild(link);
 
 function save(blob, filename) {
-
   link.href = URL.createObjectURL(blob);
   link.download = filename || "data.json";
   link.click();
-
 }
 
 function saveArrayBuffer(buffer, filename) {
-
-  save(new Blob([buffer], { type: "application/octet-stream" }), filename);
-
+  save(new Blob([buffer], {
+    type: "application/octet-stream"
+  }), filename);
 }
 
 function saveString(text, filename) {
-
-  save(new Blob([text], { type: "text/plain" }), filename);
-
+  save(new Blob([text], {
+    type: "text/plain"
+  }), filename);
 }
 
-// 导入导出处理 ImportExportHandler
+/* ImportExportHandler */
 var ImportExportHandler = function () {
 
   var self = this, reader = new FileReader();
 
   self.loadFiles = function (files) {
-
-    if (files.length > 0) { for (var i = 0; i < files.length; i++) { self.loadFile(files[i]); } }
-
+    if (files.length > 0) {
+      for (var i = 0; i < files.length; i++) { self.loadFile(files[i]); }
+    }
   };
 
   self.loadFile = function (file) {
 
-    var filename = file.name;
-    var extension = filename.split(".").pop().toLowerCase();
+    var filename = file.name, extension = filename.split(".").pop().toLowerCase();
 
     switch (extension) {
-
       case "fbx": loadFbxHandler(file); break;
       case "json": loadJsonHandler(file); break;
-
       default: break;
-
     }
 
   };
@@ -73,10 +65,11 @@ var ImportExportHandler = function () {
     reader.addEventListener("load", function (event) {
 
       var data, contents = event.target.result;
-
       try { data = JSON.parse(contents); } catch (error) { return; }
 
-      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, { quantization: [16, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, {
+        quantization: [16, 16, 16, 16, 16]
+      }), filename.split(".").shift() + ".drcobj");
 
     }, false);
 
@@ -91,10 +84,11 @@ var ImportExportHandler = function () {
     reader.addEventListener("load", function (event) {
 
       var data, contents = event.target.result;
-
       data = (new THREE.FBXLoader()).parse(contents).toJSON();
 
-      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, { quantization: [16, 16, 16, 16, 16] }), filename.split(".").shift() + ".drcobj");
+      saveArrayBuffer((new THREE.DrcobjExporter()).parse(data, {
+        quantization: [16, 16, 16, 16, 16]
+      }), filename.split(".").shift() + ".drcobj");
 
     }, false);
 

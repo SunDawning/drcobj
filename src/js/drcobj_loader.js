@@ -25,109 +25,71 @@
  * 
  */
 
-'use strict';
-
 THREE.DrcobjLoader = function (manager) {
-
   this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
-
 };
 
 THREE.DrcobjLoader.prototype = {
-
   constructor: THREE.DrcobjLoader,
+  setPath: function (value) { this.path = value; },
+  setResourcePath: function (value) { this.resourcePath = value; }
+};
 
-  load: function (url, onLoad, onProgress, onDecodeProgress, onError) {
+THREE.DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeProgress, onError) {
 
-    var self = this;
+  var self = this;
 
-    var extractUrlBase = function (url) {
+  var extractUrlBase = function (url) {
+    var index = url.lastIndexOf("/");
+    if (index === - 1) return "./";
+    return url.substr(0, index + 1);
+  };
 
-      var index = url.lastIndexOf("/");
+  var path = (this.path === undefined) ? extractUrlBase(url) : this.path;
+  this.resourcePath = this.resourcePath || path;
 
-      if (index === - 1) return "./";
+  var fileLoader = new THREE.FileLoader(self.manager);
+  fileLoader.setPath(self.path);
+  fileLoader.setResponseType("arraybuffer");
+  fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
 
-      return url.substr(0, index + 1);
+};
 
-    };
+THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress) {
 
-    var path = (this.path === undefined) ? extractUrlBase(url) : this.path;
-    this.resourcePath = this.resourcePath || path;
+  var dracoLoader = new THREE.DRACOLoader();
+  var objectLoader = new THREE.ObjectLoader();
 
-    var fileLoader = new THREE.FileLoader(self.manager);
-    fileLoader.setPath(self.path);
-    fileLoader.setResponseType("arraybuffer");
-    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
+  objectLoader.setResourcePath(this.resourcePath);
+  THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
 
-  },
+  var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
+  var modelData = new Uint8Array(buffer, 4, modelDataSize);
+  var jsonData = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
 
-  setPath: function (value) {
+  var geometriesDataOffset = 4 + modelDataSize;
+  var finishCount = 0;
 
-    this.path = value;
+  function dec(i) {
 
-  },
+    var geometryBufferStart = geometriesDataOffset + jsonData.geometries[i].data.offset;
+    var geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
+    var geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
 
-  setResourcePath: function (value) {
+    dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
 
-    this.resourcePath = value;
+      jsonData.geometries[i].data = geometry.toJSON().data;
+      ++finishCount;
 
-  },
+      if (onDecodeProgress !== undefined) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
+      if (finishCount === jsonData.geometries.length) { onLoad(objectLoader.parse(jsonData)); }
 
-  parse: function (buffer, onLoad, onDecodeProgress) {
-
-    var self = this;
-
-    var dracoLoader = new THREE.DRACOLoader();
-
-    var objectLoader = new THREE.ObjectLoader();
-    objectLoader.setResourcePath(self.resourcePath);
-
-    THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
-
-    var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
-    var modelData = new Uint8Array(buffer, 4, modelDataSize);
-
-    var jsonData = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
-
-    var geometriesDataOffset = 4 + modelDataSize;
-
-    var finishCount = 0;
-
-    for (let i = 0; i < jsonData.geometries.length; i++) {
-
-      var geometryBufferStart = geometriesDataOffset + jsonData.geometries[i].data.offset;
-      var geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
-
-      var geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
-
-      dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
-
-        jsonData.geometries[i].data = geometry.toJSON().data;
-
-        ++finishCount;
-
-        if (onDecodeProgress !== undefined) {
-
-          onDecodeProgress(finishCount / jsonData.geometries.length * 100);
-
-        }
-
-        if (finishCount === jsonData.geometries.length) {
-
-          onLoad(objectLoader.parse(jsonData));
-
-        }
-
-      });
-
-    }
+    });
 
   }
 
-};
-
-THREE.DrcobjLoader.release = function () {
-
-  THREE.DRACOLoader.releaseDecoderModule();
+  for (var i = 0; i < jsonData.geometries.length; i++) { dec(i); }
 
 };
+
+THREE.DrcobjLoader.release = function () { THREE.DRACOLoader.releaseDecoderModule(); };
