@@ -57,11 +57,13 @@ THREE.DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeP
 
 THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress) {
 
-  var dracoLoader = new THREE.DRACOLoader();
-  var objectLoader = new THREE.ObjectLoader();
+  if (self.objectLoader === undefined) { self.objectLoader = new THREE.ObjectLoader(); }
+  self.objectLoader.setResourcePath(this.resourcePath);
 
-  objectLoader.setResourcePath(this.resourcePath);
-  THREE.DRACOLoader.setDecoderConfig({ type: "wasm" });
+  if (self.dracoLoader === undefined) {
+    self.dracoLoader = new THREE.DRACOLoader();
+    self.dracoLoader.setDecoderConfig({ type: "wasm" });
+  }
 
   var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
   var modelData = new Uint8Array(buffer, 4, modelDataSize);
@@ -76,13 +78,13 @@ THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress)
     var geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
     var geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
 
-    dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
+    self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
 
       jsonData.geometries[i].data = geometry.toJSON().data;
       ++finishCount;
 
       if (onDecodeProgress !== undefined) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
-      if (finishCount === jsonData.geometries.length) { onLoad(objectLoader.parse(jsonData)); }
+      if (finishCount === jsonData.geometries.length) { onLoad(self.objectLoader.parse(jsonData)); }
 
     });
 
@@ -90,6 +92,7 @@ THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress)
 
   for (var i = 0; i < jsonData.geometries.length; i++) { dec(i); }
 
+
 };
 
-THREE.DrcobjLoader.release = function () { THREE.DRACOLoader.releaseDecoderModule(); };
+THREE.DrcobjLoader.prototype.dispose = function () { self.dracoLoader.dispose(); };
