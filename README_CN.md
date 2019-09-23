@@ -35,4 +35,4 @@ drcobjLoader.load("test.drcobj", function (object) {
 </script>
 ```
 
-### [在线文件转换 ( 支持 JSON / FBX )](https://blinking.fun/drcobj/)
+### [在线文件转换 ( 支持 JSON / FBX )](http://blog.blinking.fun/drcobj/)

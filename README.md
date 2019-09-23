@@ -35,4 +35,4 @@ drcobjLoader.load("test.drcobj", function (object) {
 </script>
 ```
 
-### [online file conversion ( fbx / json to drcobj )](https://blinking.fun/drcobj/)
+### [online file conversion ( fbx / json to drcobj )](http://blog.blinking.fun/drcobj/)
