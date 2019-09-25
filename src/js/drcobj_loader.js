@@ -55,7 +55,7 @@ THREE.DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeP
 
 };
 
-THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress) {
+THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress, isInflate) {
 
   if (self.objectLoader === undefined) { self.objectLoader = new THREE.ObjectLoader(); }
   self.objectLoader.setResourcePath(this.resourcePath);
@@ -64,6 +64,14 @@ THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress)
     self.dracoLoader = new THREE.DRACOLoader();
     self.dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.5-pre/src/vendor/');
     self.dracoLoader.setDecoderConfig({ type: "wasm" });
+  }
+
+  if (isInflate === undefined) { isInflate = false; }
+
+  if (isInflate) {
+    var ui8Buffer = new Uint8Array(buffer);
+    var inflate = new Zlib.Inflate(ui8Buffer);
+    buffer = inflate.decompress().buffer;
   }
 
   var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];

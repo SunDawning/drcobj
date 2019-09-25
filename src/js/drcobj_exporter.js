@@ -45,6 +45,8 @@ THREE.DrcobjExporter.prototype.parse = function (json, options) {
 
   };
 
+  if (options === undefined) { options = {}; }
+
   var drcGeometries = this.drcParse(json, options);
 
   var sumGeometryBuffersByteLength = 0;
@@ -71,6 +73,14 @@ THREE.DrcobjExporter.prototype.parse = function (json, options) {
     offset += drcGeometries[i].byteLength;
   }
 
+  if (options.isDeflate === undefined) { options.isDeflate = false; }
+
+  if (options.isDeflate) {
+    var ui8OutputDataBuffer = new Uint8Array(outputDataBuffer);
+    var deflate = new Zlib.Deflate(ui8OutputDataBuffer);
+    outputDataBuffer = deflate.compress();
+  }
+
   return outputDataBuffer;
 
 };
@@ -81,8 +91,6 @@ THREE.DrcobjExporter.prototype.drcParse = function (json, options) {
 
   var dracoExporter = new THREE.DRACOExporter();
   var bufferGeometryLoader = new THREE.BufferGeometryLoader();
-
-  if (options === undefined) { options = {}; }
 
   if (options.decodeSpeed === undefined) { options.decodeSpeed = 5; }
   if (options.encodeSpeed === undefined) { options.encodeSpeed = 5; }

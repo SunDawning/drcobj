@@ -1,4 +1,3 @@
-/* Import */
 var form = document.createElement("form");
 document.body.appendChild(form);
 
@@ -12,7 +11,6 @@ fileInput.addEventListener("change", function (event) {
 
 form.appendChild(fileInput);
 
-/* Export */
 var link = document.createElement("a");
 link.style.display = "none";
 document.body.appendChild(link);
@@ -35,7 +33,6 @@ function saveString(text, filename) {
   }), filename);
 }
 
-/* ImportExportHandler */
 var ImportExportHandler = function () {
 
   var self = this, reader = new FileReader();
