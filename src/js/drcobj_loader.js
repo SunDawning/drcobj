@@ -62,7 +62,7 @@ THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress,
 
   if (self.dracoLoader === undefined) {
     self.dracoLoader = new THREE.DRACOLoader();
-    self.dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.5-pre/src/vendor/');
+    self.dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.6-pre/src/vendor/');
     self.dracoLoader.setDecoderConfig({ type: "wasm" });
   }
 
