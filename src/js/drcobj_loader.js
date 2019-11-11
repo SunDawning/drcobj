@@ -25,83 +25,75 @@
  * 
  */
 
-THREE.DrcobjLoader = function (manager) {
-  this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
-};
+THREE.DrcobjLoader = (function () {
 
-THREE.DrcobjLoader.prototype = {
-  constructor: THREE.DrcobjLoader,
-  setPath: function (value) { this.path = value; },
-  setResourcePath: function (value) { this.resourcePath = value; }
-};
+  function DrcobjLoader(manager) {
+    this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
+  }
 
-THREE.DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeProgress, onError) {
+  DrcobjLoader.prototype.setPath = function (value) { this.path = value; };
+  DrcobjLoader.prototype.setResourcePath = function (value) { this.resourcePath = value; };
 
-  var self = this;
+  DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeProgress, onError) {
+
+    var self = this;
+
+    var path = (this.path === undefined) ? extractUrlBase(url) : this.path;
+    this.resourcePath = this.resourcePath || path;
+
+    var fileLoader = new THREE.FileLoader(self.manager);
+    fileLoader.setPath(self.path);
+    fileLoader.setResponseType("arraybuffer");
+
+    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
+
+  };
+
+  DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress, isInflate) {
+
+    if (self.objectLoader === undefined) { self.objectLoader = new THREE.ObjectLoader(); }
+    self.objectLoader.setResourcePath(this.resourcePath);
+
+    if (self.dracoLoader === undefined) {
+      self.dracoLoader = new THREE.DRACOLoader();
+      // self.dracoLoader.setDecoderPath("./src/vendor/");
+      self.dracoLoader.setDecoderConfig({ type: "wasm" });
+    }
+
+    if (isInflate) { buffer = (new Zlib.Inflate(new Uint8Array(buffer))).decompress().buffer; }
+
+    var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
+    var modelData = new Uint8Array(buffer, 4, modelDataSize);
+    var jsonData = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
+
+    var geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
+    var geometriesDataOffset = 4 + modelDataSize;
+
+    function decode(i) {
+
+      geometryBufferStart = geometriesDataOffset + jsonData.geometries[i].data.offset;
+      geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
+      geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
+
+      self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
+        jsonData.geometries[i].data = geometry.toJSON().data; ++finishCount;
+        if (onDecodeProgress) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
+        if (finishCount === jsonData.geometries.length) { onLoad(self.objectLoader.parse(jsonData)); }
+      });
+
+    }
+
+    for (var i = 0; i < jsonData.geometries.length; i++) { decode(i); }
+
+  };
+
+  DrcobjLoader.prototype.dispose = function () { this.dracoLoader.dispose(); };
 
   var extractUrlBase = function (url) {
     var index = url.lastIndexOf("/");
-    if (index === - 1) return "./";
-    return url.substr(0, index + 1);
+    if (index === - 1) { return "./"; } return url.substr(0, index + 1);
   };
 
-  var path = (this.path === undefined) ? extractUrlBase(url) : this.path;
-  this.resourcePath = this.resourcePath || path;
+  return DrcobjLoader;
 
-  var fileLoader = new THREE.FileLoader(self.manager);
-  fileLoader.setPath(self.path);
-  fileLoader.setResponseType("arraybuffer");
-  fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
-
-};
-
-THREE.DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress, isInflate) {
-
-  if (self.objectLoader === undefined) { self.objectLoader = new THREE.ObjectLoader(); }
-  self.objectLoader.setResourcePath(this.resourcePath);
-
-  if (self.dracoLoader === undefined) {
-    self.dracoLoader = new THREE.DRACOLoader();
-    self.dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.6-pre/src/vendor/');
-    self.dracoLoader.setDecoderConfig({ type: "wasm" });
-  }
-
-  if (isInflate === undefined) { isInflate = false; }
-
-  if (isInflate) {
-    var ui8Buffer = new Uint8Array(buffer);
-    var inflate = new Zlib.Inflate(ui8Buffer);
-    buffer = inflate.decompress().buffer;
-  }
-
-  var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
-  var modelData = new Uint8Array(buffer, 4, modelDataSize);
-  var jsonData = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
-
-  var geometriesDataOffset = 4 + modelDataSize;
-  var finishCount = 0;
-
-  function dec(i) {
-
-    var geometryBufferStart = geometriesDataOffset + jsonData.geometries[i].data.offset;
-    var geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
-    var geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
-
-    self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
-
-      jsonData.geometries[i].data = geometry.toJSON().data;
-      ++finishCount;
-
-      if (onDecodeProgress !== undefined) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
-      if (finishCount === jsonData.geometries.length) { onLoad(self.objectLoader.parse(jsonData)); }
-
-    });
-
-  }
-
-  for (var i = 0; i < jsonData.geometries.length; i++) { dec(i); }
-
-
-};
-
-THREE.DrcobjLoader.prototype.dispose = function () { self.dracoLoader.dispose(); };
+})();

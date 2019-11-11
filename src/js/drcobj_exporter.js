@@ -70,8 +70,6 @@ THREE.DrcobjExporter = (function () {
 
     }
 
-    if (options.isDeflate === undefined) { options.isDeflate = false; }
-
     if (options.isDeflate) {
 
       var ui8OutputDataBuffer = new Uint8Array(outputDataBuffer);
