@@ -1,6 +1,6 @@
 # Draco 3D Object
 
-![releases](https://img.shields.io/badge/releases-0.9.6.1--PRE-blue.svg?style=flat-square)
+![releases](https://img.shields.io/badge/releases-1.0.0-blue.svg?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
 
 ### [简体中文](https://github.com/Ouyang-Zhaoxing/drcobj/blob/master/README_CN.md)
@@ -14,11 +14,11 @@ You can use **drcobj_exporter.js** to convert a threejs-object (.json) file to a
 ### drcobj_loader:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r106/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/build/three.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.6.1-pre/src/vendor/draco_decoder.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.6.1-pre/src/vendor/draco_loader.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v0.9.6.1-pre/src/js/drcobj_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v1.0.0/src/vendor/draco_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v1.0.0/src/vendor/draco_loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@v1.0.0/src/js/drcobj_loader.js"></script>
 
 <script>
 
@@ -35,4 +35,4 @@ drcobjLoader.load("test.drcobj", function (object) {
 </script>
 ```
 
-### [online file conversion ( fbx / json to drcobj )](http://blog.blinking.fun/drcobj/)
+### [online file conversion ( fbx / json to drcobj )]()
