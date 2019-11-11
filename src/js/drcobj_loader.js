@@ -33,6 +33,7 @@ THREE.DrcobjLoader = (function () {
 
   DrcobjLoader.prototype.setPath = function (value) { this.path = value; };
   DrcobjLoader.prototype.setResourcePath = function (value) { this.resourcePath = value; };
+  DrcobjLoader.prototype.setDecoderPath = function (value) { this.decoderPath = value; };
 
   DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeProgress, onError) {
 
@@ -56,7 +57,7 @@ THREE.DrcobjLoader = (function () {
 
     if (self.dracoLoader === undefined) {
       self.dracoLoader = new THREE.DRACOLoader();
-      // self.dracoLoader.setDecoderPath("./src/vendor/");
+      self.dracoLoader.setDecoderPath(self.decoderPath);
       self.dracoLoader.setDecoderConfig({ type: "wasm" });
     }
 
