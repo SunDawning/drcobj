@@ -52,6 +52,8 @@ THREE.DrcobjLoader = (function () {
 
   DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress, isInflate) {
 
+    var self = this;
+
     if (self.objectLoader === undefined) { self.objectLoader = new THREE.ObjectLoader(); }
     self.objectLoader.setResourcePath(this.resourcePath);
 
