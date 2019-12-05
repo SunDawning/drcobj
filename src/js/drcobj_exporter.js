@@ -37,7 +37,7 @@ THREE.DrcobjExporter = (function () {
 
     var drcGeometries = this.drcParse(json, options);
 
-    for (let i = 0; i < json.geometries.length; i++) {
+    for (var i = 0; i < json.geometries.length; i++) {
 
       var geometryBufferByteLength = drcGeometries[i].byteLength;
 
@@ -62,11 +62,11 @@ THREE.DrcobjExporter = (function () {
 
     modelData.set(new Uint8Array(jsonBuffer));
 
-    for (let i = 0, offset = 0; i < drcGeometries.length; i++) {
+    for (var j = 0, offset = 0; j < drcGeometries.length; j++) {
 
-      modelGeometries.set(drcGeometries[i], offset);
+      modelGeometries.set(drcGeometries[j], offset);
 
-      offset += drcGeometries[i].byteLength;
+      offset += drcGeometries[j].byteLength;
 
     }
 
@@ -97,7 +97,7 @@ THREE.DrcobjExporter = (function () {
     if (options.exportNormals === undefined) { options.exportNormals = true; }
     if (options.exportColor === undefined) { options.exportColor = false; }
 
-    for (let i = 0; i < json.geometries.length; i++) {
+    for (var i = 0; i < json.geometries.length; i++) {
 
       var geometry = bufferGeometryLoader.parse(json.geometries[i]);
       var drcGeometry = dracoExporter.parse(geometry, options);
@@ -115,7 +115,7 @@ THREE.DrcobjExporter = (function () {
     var buffer = new ArrayBuffer(str.length);
     var bufferView = new Uint8Array(buffer);
 
-    for (let i = 0, strLen = str.length; i < strLen; i++) {
+    for (var i = 0, strLen = str.length; i < strLen; i++) {
       bufferView[i] = str.charCodeAt(i);
     }
 
