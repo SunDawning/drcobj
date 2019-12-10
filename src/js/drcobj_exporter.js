@@ -31,7 +31,7 @@ THREE.DrcobjExporter = (function () {
 
   DrcobjExporter.prototype.parse = function (json, options) {
 
-    var outputBuffer, sumGeometryBuffersByteLength = 0;
+    var outputDataBuffer, sumGeometryBuffersByteLength = 0;
 
     if (options === undefined) { options = {}; }
 
