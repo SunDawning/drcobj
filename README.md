@@ -36,5 +36,3 @@ drcobjLoader.load("model.drcobj", function (object) {
 
 </script>
 ```
-
-### [online file conversion ( fbx / json to drcobj )]()

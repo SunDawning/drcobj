@@ -36,5 +36,3 @@ drcobjLoader.load("model.drcobj", function (object) {
 
 </script>
 ```
-
-### [在线文件转换 ( 支持 JSON / FBX )]()
