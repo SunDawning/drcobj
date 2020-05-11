@@ -20,13 +20,15 @@ THREE.DRACOLoader = function ( manager ) {
 		position: 'POSITION',
 		normal: 'NORMAL',
 		color: 'COLOR',
-		uv: 'TEX_COORD'
+		uv: 'TEX_COORD',
+		uv2: 'TEX_COORD',
 	};
 	this.defaultAttributeTypes = {
 		position: 'Float32Array',
 		normal: 'Float32Array',
 		color: 'Float32Array',
-		uv: 'Float32Array'
+		uv: 'Float32Array',
+		uv2: 'Float32Array'
 	};
 
 };

@@ -112,6 +112,14 @@ THREE.DRACOExporter.prototype = {
 
 			}
 
+			var uv2 = geometry.getAttribute( 'uv2' );
+
+			if ( uv2 !== undefined ) {
+
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, uv2.count, uv2.itemSize, uv2.array );
+
+			}
+
 		}
 
 		if ( options.exportColor === true ) {
