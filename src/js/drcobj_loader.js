@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- * Copyright (c) 2019 Blinking
+ * Copyright (c) 2019-2020 Blinking
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ THREE.DrcobjLoader = (function () {
       self.dracoLoader = new THREE.DRACOLoader();
       self.dracoLoader.setDecoderPath(self.decoderPath);
       self.dracoLoader.setDecoderConfig({ type: "wasm" });
+      self.dracoLoader.setWorkerLimit(8);
     }
 
     if (isInflate) { buffer = (new Zlib.Inflate(new Uint8Array(buffer))).decompress().buffer; }
