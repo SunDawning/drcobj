@@ -542,24 +542,13 @@ THREE.DRACOLoader.DRACOWorker = function () {
 			// Generate mesh faces.
 			var numFaces = dracoGeometry.num_faces();
 			var numIndices = numFaces * 3;
-			var index = new Uint32Array( numIndices );
-			var indexArray = new draco.DracoInt32Array();
-
-			for ( var i = 0; i < numFaces; ++ i ) {
-
-				decoder.GetFaceFromMesh( dracoGeometry, i, indexArray );
-
-				for ( var j = 0; j < 3; ++ j ) {
-
-					index[ i * 3 + j ] = indexArray.GetValue( j );
-
-				}
-
-			}
+			var dataSize = numIndices * 4;
+			var ptr = draco._malloc( dataSize );
+			decoder.GetTrianglesUInt32Array( dracoGeometry, dataSize, ptr );
+			var index = new Uint32Array( draco.HEAPU32.buffer, ptr, numIndices ).slice();
+			draco._free( ptr );
 
 			geometry.index = { array: index, itemSize: 1 };
-
-			draco.destroy( indexArray );
 
 		}
 
@@ -575,65 +564,68 @@ THREE.DRACOLoader.DRACOWorker = function () {
 		var numPoints = dracoGeometry.num_points();
 		var numValues = numPoints * numComponents;
 		var dracoArray;
-
+		var ptr;
 		var array;
 
 		switch ( attributeType ) {
 
 			case Float32Array:
-				dracoArray = new draco.DracoFloat32Array();
-				decoder.GetAttributeFloatForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Float32Array( numValues );
+				var dataSize = numValues * 4;
+				ptr = draco._malloc( dataSize );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_FLOAT32, dataSize, ptr );
+				array = new Float32Array( draco.HEAPF32.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Int8Array:
-				dracoArray = new draco.DracoInt8Array();
-				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int8Array( numValues );
+				ptr = draco._malloc( numValues );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_INT8, numValues, ptr );
+				geometryBuffer[ attributeName ] = new Int8Array( draco.HEAP8.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Int16Array:
-				dracoArray = new draco.DracoInt16Array();
-				decoder.GetAttributeInt16ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int16Array( numValues );
+				var dataSize = numValues * 2;
+				ptr = draco._malloc( dataSize );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_INT16, dataSize, ptr );
+				array = new Int16Array( draco.HEAP16.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Int32Array:
-				dracoArray = new draco.DracoInt32Array();
-				decoder.GetAttributeInt32ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int32Array( numValues );
+				var dataSize = numValues * 4;
+				ptr = draco._malloc( dataSize );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_INT32, dataSize, ptr );
+				array = new Int32Array( draco.HEAP32.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Uint8Array:
-				dracoArray = new draco.DracoUInt8Array();
-				decoder.GetAttributeUInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint8Array( numValues );
+				ptr = draco._malloc( numValues );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_UINT8, numValues, ptr );
+				geometryBuffer[ attributeName ] = new Uint8Array( draco.HEAPU8.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Uint16Array:
-				dracoArray = new draco.DracoUInt16Array();
-				decoder.GetAttributeUInt16ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint16Array( numValues );
+				var dataSize = numValues * 2;
+				ptr = draco._malloc( dataSize );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_UINT16, dataSize, ptr );
+				array = new Uint16Array( draco.HEAPU16.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			case Uint32Array:
-				dracoArray = new draco.DracoUInt32Array();
-				decoder.GetAttributeUInt32ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint32Array( numValues );
+				var dataSize = numValues * 4;
+				ptr = draco._malloc( dataSize );
+				decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, draco.DT_UINT32, dataSize, ptr );
+				array = new Uint32Array( draco.HEAPU32.buffer, ptr, numValues ).slice();
+				draco._free( ptr );
 				break;
 
 			default:
 				throw new Error( 'THREE.DRACOLoader: Unexpected attribute type.' );
-
-		}
-
-		for ( var i = 0; i < numValues; i ++ ) {
-
-			array[ i ] = dracoArray.GetValue( i );
-
-		}
-
-		draco.destroy( dracoArray );
+                }
 
 		return {
 			name: attributeName,
