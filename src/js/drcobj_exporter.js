@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- * Copyright (c) 2019 Blinking
+ * Copyright (c) 2019-2020 Blinking
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ THREE.DrcobjExporter = (function () {
     if (options.decodeSpeed === undefined) { options.decodeSpeed = 5; }
     if (options.encodeSpeed === undefined) { options.encodeSpeed = 5; }
     if (options.encoderMethod === undefined) { options.encoderMethod = THREE.DRACOExporter.MESH_EDGEBREAKER_ENCODING; }
-    if (options.quantization === undefined) { options.quantization = [16, 10, 8, 10, 8]; }
+    if (options.quantization === undefined) { options.quantization = [16, 8, 10, 8, 8]; }
     if (options.exportUvs === undefined) { options.exportUvs = true; }
     if (options.exportNormals === undefined) { options.exportNormals = true; }
     if (options.exportColor === undefined) { options.exportColor = false; }
@@ -126,4 +126,3 @@ THREE.DrcobjExporter = (function () {
   return DrcobjExporter;
 
 })();
-
