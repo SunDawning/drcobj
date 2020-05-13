@@ -1,6 +1,6 @@
 # ![logo](https://cdn.jsdelivr.net/gh/Ouyang-Zhaoxing/drcobj@master/logo.png) Draco 3D Object
 
-![releases](https://img.shields.io/badge/releases-1.0.3.1-blue.svg?style=flat-square)
+![releases](https://img.shields.io/badge/releases-1.0.3.2-blue.svg?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
 
 ### [简体中文](https://github.com/Ouyang-Zhaoxing/drcobj/blob/master/README_CN.md)
