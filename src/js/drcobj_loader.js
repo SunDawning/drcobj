@@ -35,7 +35,7 @@ THREE.DrcobjLoader = (function () {
   DrcobjLoader.prototype.setResourcePath = function (value) { this.resourcePath = value; };
   DrcobjLoader.prototype.setDecoderPath = function (value) { this.decoderPath = value; };
 
-  DrcobjLoader.prototype.load = function (url, onLoad, onProgress, onDecodeProgress, onError) {
+  DrcobjLoader.prototype.load = function (url, onLoad, onJsonDataProgress, onProgress, onDecodeProgress, onError) {
 
     var self = this;
 
@@ -46,11 +46,11 @@ THREE.DrcobjLoader = (function () {
     fileLoader.setPath(self.path);
     fileLoader.setResponseType("arraybuffer");
 
-    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onDecodeProgress); }, onProgress, onError);
+    fileLoader.load(url, function (buffer) { self.parse(buffer, onLoad, onJsonDataProgress, onDecodeProgress); }, onProgress, onError);
 
   };
 
-  DrcobjLoader.prototype.parse = function (buffer, onLoad, onDecodeProgress, isInflate) {
+  DrcobjLoader.prototype.parse = function (buffer, onLoad, onJsonDataProgress, onDecodeProgress, isInflate) {
 
     var self = this;
 
@@ -69,6 +69,8 @@ THREE.DrcobjLoader = (function () {
     var modelDataSize = (new Uint32Array(buffer, 0, 1))[0];
     var modelData = new Uint8Array(buffer, 4, modelDataSize);
     var jsonData = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
+
+    if (onJsonDataProgress) { onJsonDataProgress(jsonData); }
 
     var geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
     var geometriesDataOffset = 4 + modelDataSize;
