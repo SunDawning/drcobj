@@ -29,10 +29,18 @@
       mesh.material.name="材质";
       return mesh;
     }
-    output.models=createMesh();
-    new DrcobjLoader().parse(new DrcobjExporter().parse(output.models.toJSON()),function(object){
-      output.drcobjModels=object;
-      console.log(output.models,output.drcobjModels,now()-output.startTime);
+    function createModels(){
+      let group=new THREE.Group();
+      group.name="组";
+      let mesh=createMesh();
+      for(let c=0;c<Math.pow(10,5);c++){
+        group.add(mesh.clone());
+      }
+      return group;
+    }
+    let loader=new DrcobjLoader();
+    loader.parse(new DrcobjExporter().parse(createModels().toJSON()),function(object){
+      loader.dispose();
     });
     return output;
   }
