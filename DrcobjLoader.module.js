@@ -78,10 +78,15 @@ DrcobjLoader.prototype={
             geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
             geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
 
+            var length=jsonData.geometries.length;
+            jsonData.geometries={}; // Avoid duplicating toJSON and parseGeometries process.
+
             self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
-                jsonData.geometries[i].data = geometry.toJSON().data; ++finishCount;
-                if (onDecodeProgress) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
-                if (finishCount === jsonData.geometries.length) {
+                geometry.uuid=geometries[i].uuid; // THREE.ObjectLoader: Undefined geometry
+                jsonData.geometries[geometry.uuid] = geometry;
+                ++finishCount;
+                if (onDecodeProgress) { onDecodeProgress(finishCount / length * 100); }
+                if (finishCount === length) {
                     if(onLoad){
                         onLoad(self.objectLoader.parse(jsonData));
                     }
@@ -95,7 +100,7 @@ DrcobjLoader.prototype={
     },
     dispose:function () { this.dracoLoader.dispose(); }
 
-    
+
 }
 var extractUrlBase = function (url) {
     var index = url.lastIndexOf("/");
