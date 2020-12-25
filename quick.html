@@ -5,17 +5,21 @@
   import {DrcobjLoader} from "./DrcobjLoader.module.js";
   function init(){
     let output={};
+    function now(){
+      return new Date().getTime()
+    };
+    output.startTime=now();
     output.THREE=THREE;
     output.DrcobjExporter=DrcobjExporter;
     function createMesh(){
       const geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array( [
-	-1.0, -1.0,  1.0,
+        -1.0, -1.0,  1.0,
         1.0, -1.0,  1.0,
         1.0,  1.0,  1.0,
         1.0,  1.0,  1.0,
-	-1.0,  1.0,  1.0,
-	-1.0, -1.0,  1.0
+        -1.0,  1.0,  1.0,
+        -1.0, -1.0,  1.0
       ] );
       geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
       const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -28,7 +32,7 @@
     output.models=createMesh();
     new DrcobjLoader().parse(new DrcobjExporter().parse(output.models.toJSON()),function(object){
       output.drcobjModels=object;
-      console.log(output.models,output.drcobjModels);
+      console.log(output.models,output.drcobjModels,now()-output.startTime);
     });
     return output;
   }
