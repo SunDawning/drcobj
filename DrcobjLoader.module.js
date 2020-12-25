@@ -81,7 +81,11 @@ DrcobjLoader.prototype={
             self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
                 jsonData.geometries[i].data = geometry.toJSON().data; ++finishCount;
                 if (onDecodeProgress) { onDecodeProgress(finishCount / jsonData.geometries.length * 100); }
-                if (finishCount === jsonData.geometries.length) { onLoad(self.objectLoader.parse(jsonData)); }
+                if (finishCount === jsonData.geometries.length) {
+                    if(onLoad){
+                        onLoad(self.objectLoader.parse(jsonData));
+                    }
+                }
             });
 
         }

@@ -115,7 +115,7 @@ function stringToByteArray(str) {
 
     // javascript中string转UTF8格式byte数组_第三眼的思绪-CSDN博客: https://blog.csdn.net/a123638/article/details/46535239
     function str2UTF8(str){
-        var bytes = new Array(); 
+        var bytes = new Array();
         var len,c;
         len = str.length;
         for(var i = 0; i < len; i++){
