@@ -37,6 +37,7 @@
     let loader=new DrcobjLoader();
     loader.parse(new DrcobjExporter().parse(createModels().toJSON()),function(object){
       loader.dispose();
+      console.log(object.children.length);
     });
     return output;
   }
