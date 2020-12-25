@@ -72,13 +72,14 @@ DrcobjLoader.prototype={
         var geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
         var geometriesDataOffset = 4 + modelDataSize;
 
+        var geometries=jsonData.geometries;
+        var length=geometries.length;
         function decode(i) {
 
             geometryBufferStart = geometriesDataOffset + jsonData.geometries[i].data.offset;
             geometryBufferEnd = geometryBufferStart + jsonData.geometries[i].data.byteLength;
             geometryBuffer = buffer.slice(geometryBufferStart, geometryBufferEnd);
 
-            var length=jsonData.geometries.length;
             jsonData.geometries={}; // Avoid duplicating toJSON and parseGeometries process.
 
             self.dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
@@ -95,7 +96,7 @@ DrcobjLoader.prototype={
 
         }
 
-        for (var i = 0; i < jsonData.geometries.length; i++) { decode(i); }
+        for (var i = 0; i < length; i++) { decode(i); }
 
     },
     dispose:function () { this.dracoLoader.dispose(); }
