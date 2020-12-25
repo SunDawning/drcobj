@@ -5,10 +5,6 @@
   import {DrcobjLoader} from "./DrcobjLoader.module.js";
   function init(){
     let output={};
-    function now(){
-      return new Date().getTime()
-    };
-    output.startTime=now();
     output.THREE=THREE;
     output.DrcobjExporter=DrcobjExporter;
     function createMesh(){
