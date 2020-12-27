@@ -28,8 +28,8 @@
       var group=new THREE.Group();
       group.name="组";
       var mesh=createMesh();
-      for(var c=0;c<Math.pow(10,2);c++){
-        group.add(mesh.clone());
+      for(var c=0;c<Math.pow(10,1);c++){
+        group.add(new THREE.Mesh(mesh.geometry.clone(),mesh.material));
       }
       return group;
     }
@@ -320,7 +320,7 @@
         offset += geometries[key].byteLength;
       }
       console.log(geometries)
-      
+
       return outputDataBuffer;
     }
     function arrayBufferToObject3D(arrayBuffer,onFinish){
@@ -334,7 +334,7 @@
       var geometriesDataOffset = 4 + modelDataSize;
 
       var length=Object.keys(json.geometries).length;
-      for (var key in json.geometries) {
+      for (let key in json.geometries) {
         geometryBufferStart = geometriesDataOffset + json.geometries[key].offset;
         geometryBufferEnd = geometryBufferStart + json.geometries[key].byteLength;
         geometryBuffer = arrayBuffer.slice(geometryBufferStart, geometryBufferEnd);
@@ -349,7 +349,7 @@
             }
           }
         });
-        
+
         var objectLoader=new THREE.ObjectLoader();
         // 修改THREE.ObjectLoader.parse，让其不处理json.geometries
         function fromJSON( json, onLoad ) {
