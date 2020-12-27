@@ -29,7 +29,11 @@
       group.name="组";
       var mesh=createMesh();
       for(var c=0;c<Math.pow(10,1);c++){
-        group.add(new THREE.Mesh(mesh.geometry.clone(),mesh.material));
+        let geometry=mesh.geometry.clone();
+        geometry.name=geometry.name+c;
+        let meshClone= new THREE.Mesh(geometry,mesh.material);
+        meshClone.name=mesh.name+c;
+        group.add(meshClone);
       }
       return group;
     }
@@ -263,12 +267,13 @@
 
       var geometries={};
       var sumGeometryBuffersByteLength=0;
-      for(var key in json.geometries){
+      for(let key in json.geometries){
         geometries[key]=dracoExporter.parse(json.geometries[key]);
         var byteLength=geometries[key].byteLength;
         json.geometries[key]={
           offset:sumGeometryBuffersByteLength,
-          byteLength:byteLength
+          byteLength:byteLength,
+          name:json.geometries[key].name
         };
         sumGeometryBuffersByteLength=sumGeometryBuffersByteLength+byteLength;
       }
@@ -314,12 +319,9 @@
       var modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
       modelDataSize[0] = jsonBuffer.byteLength;
       modelData.set(new Uint8Array(jsonBuffer));
-      var offset=0;
       for (var key in geometries) {
-        modelGeometries.set(geometries[key], offset);
-        offset += geometries[key].byteLength;
+        modelGeometries.set(geometries[key], json.geometries[key].offset);
       }
-      console.log(geometries)
 
       return outputDataBuffer;
     }
@@ -339,8 +341,8 @@
         geometryBufferEnd = geometryBufferStart + json.geometries[key].byteLength;
         geometryBuffer = arrayBuffer.slice(geometryBufferStart, geometryBufferEnd);
         dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
-          json.geometries[key]=null;
           geometry.uuid=key;
+          geometry.name=json.geometries[key].name;
           json.geometries[key]=geometry;
           ++finishCount;
           if (finishCount === length) {
