@@ -33,6 +33,7 @@
         geometry.name=geometry.name+c;
         let meshClone= new THREE.Mesh(geometry,mesh.material);
         meshClone.name=mesh.name+c;
+        meshClone.position.set(Math.random(),Math.random(),Math.random());
         group.add(meshClone);
       }
       console.log("Before:",group)
@@ -41,6 +42,10 @@
     function object3DToArrayBuffer(object3D){
       let dracoExporter=new DRACOExporter();
 
+      // 保存object3D的状态
+      object3D.traverse(function(node){
+        node.updateMatrix();
+      });
       // 修改Object3D.toJSON，让其不处理Geometry
       function toJSON(object3D,meta){
 
