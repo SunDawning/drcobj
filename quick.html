@@ -1,4 +1,5 @@
 <script type="text/javascript" src="./src/vendor/draco_encoder.js"></script>
+<script type="text/javascript" src="./zlib.min.js"></script>
 <script type="module">
   import * as THREE from "./three.module.js";
   import {DRACOExporter} from "./DRACOExporter.module.js";
@@ -8,12 +9,12 @@
     function createMesh(){
       let geometry = new THREE.BufferGeometry();
       let vertices = new Float32Array( [
-        -1.0, -1.0,  1.0,
+                                                                        -1.0, -1.0,  1.0,
         1.0, -1.0,  1.0,
         1.0,  1.0,  1.0,
         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0, -1.0,  1.0
+                                                                        -1.0,  1.0,  1.0,
+                                                                        -1.0, -1.0,  1.0
       ] );
       geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
       let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -27,7 +28,7 @@
       let group=new THREE.Group();
       group.name="组";
       let mesh=createMesh();
-      for(let c=0;c<Math.pow(10,1);c++){
+      for(let c=0;c<Math.pow(10,3);c++){
         let geometry=mesh.geometry.clone();
         geometry.name=geometry.name+c;
         let meshClone= new THREE.Mesh(geometry,mesh.material);
@@ -42,7 +43,6 @@
      * JSON字符串里也有geometries，只是其中保存的是经过DRACO处理的几何体的位置、名称及用户数据，便于解压后还原数据。 */
     function object3DToArrayBuffer(object3D){
       let dracoExporter=new DRACOExporter();
-
       // 保存object3D的状态
       object3D.traverse(function(node){
         node.updateMatrix();
@@ -364,7 +364,7 @@
             geometry.userData=json.geometries[key].userData;
           }
           json.geometries[key]=geometry;
-                     ++finishCount;
+                                                                                                                                                        ++finishCount;
           if (finishCount === length) {
             let object3D=fromJSON(json);
             console.log("After:",object3D);
@@ -440,20 +440,38 @@
 	// URL.revokeObjectURL( url ); breaks Firefox...
 
       }
+      console.log(buffer);
       save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
     };
+    let rawFileName="scene.drcobj";
+    let zlibFileName="scene.zlib";
     output.export=function(){
-      saveArrayBuffer(object3DToArrayBuffer(createModels()),"scene.drcobj");
+      let buffer=object3DToArrayBuffer(createModels());
+      let startTime=new Date().getTime();
+      saveArrayBuffer(buffer,rawFileName);
+      console.log("Raw Duratiion:",new Date().getTime()-startTime);
+      startTime=new Date().getTime();
+      buffer=new Zlib.Deflate(new Uint8Array(buffer)).compress();
+      saveArrayBuffer(buffer,zlibFileName);
+      console.log("Zlib Duratiion:",new Date().getTime()-startTime);
     }
-    function loadFile(url){
+    function loadFile(url,onLoad){
+      let startTime=new Date().getTime();
       let fileLoader=new THREE.FileLoader();
       fileLoader.setResponseType("arraybuffer");
       fileLoader.load(url,function(buffer){
+        if(onLoad){
+          buffer=onLoad(buffer)
+        }
+        console.log("Duration:",new Date().getTime()-startTime);
         arrayBufferToObject3D(buffer);
       });
     };
     output.import=function(){
-      loadFile("scene.drcobj");
+      loadFile(rawFileName);
+      loadFile(zlibFileName,function(buffer){
+        return (new Zlib.Inflate(new Uint8Array(buffer))).decompress().buffer;
+      });
     }
     return output;
   }
