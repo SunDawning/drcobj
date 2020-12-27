@@ -39,6 +39,8 @@
       console.log("Before:",group)
       return group;
     }
+    /* 返回值的数据格式里依次是：空白标记、JSON字符串和一些经过DRACO压缩处理的几何体geometries。
+     * JSON字符串里也有geometries，只是其中保存的是经过DRACO处理的几何体的位置、名称及用户数据，便于解压后还原数据。 */
     function object3DToArrayBuffer(object3D){
       let dracoExporter=new DRACOExporter();
 
@@ -338,6 +340,7 @@
 
       return outputDataBuffer;
     }
+    /* 异步解压还原由object3DToArrayBuffer所生成的数据 */
     function arrayBufferToObject3D(arrayBuffer,onFinish){
       let dracoLoader= new DRACOLoader();
 
@@ -362,7 +365,7 @@
             geometry.userData=json.geometries[key].userData;
           }
           json.geometries[key]=geometry;
-          ++finishCount;
+                     ++finishCount;
           if (finishCount === length) {
             let object3D=fromJSON(json);
             console.log("After:",object3D);
