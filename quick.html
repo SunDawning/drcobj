@@ -4,49 +4,50 @@
   import {DRACOExporter} from "./DRACOExporter.module.js";
   import {DRACOLoader} from "./DRACOLoader.module.js";
   function init(){
-    var output={};
+    let output={};
     output.THREE=THREE;
     function createMesh(){
-      const geometry = new THREE.BufferGeometry();
-      const vertices = new Float32Array( [
-                                                                          -1.0, -1.0,  1.0,
+      let geometry = new THREE.BufferGeometry();
+      let vertices = new Float32Array( [
+        -1.0, -1.0,  1.0,
         1.0, -1.0,  1.0,
         1.0,  1.0,  1.0,
         1.0,  1.0,  1.0,
-                                                                          -1.0,  1.0,  1.0,
-                                                                          -1.0, -1.0,  1.0
+        -1.0,  1.0,  1.0,
+        -1.0, -1.0,  1.0
       ] );
       geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-      const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-      const mesh = new THREE.Mesh( geometry, material );
+      let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+      let mesh = new THREE.Mesh( geometry, material );
       mesh.name="物体";
       mesh.geometry.name="几何体";
       mesh.material.name="材质";
       return mesh;
     }
     function createModels(){
-      var group=new THREE.Group();
+      let group=new THREE.Group();
       group.name="组";
-      var mesh=createMesh();
-      for(var c=0;c<Math.pow(10,1);c++){
+      let mesh=createMesh();
+      for(let c=0;c<Math.pow(10,1);c++){
         let geometry=mesh.geometry.clone();
         geometry.name=geometry.name+c;
         let meshClone= new THREE.Mesh(geometry,mesh.material);
         meshClone.name=mesh.name+c;
         group.add(meshClone);
       }
+      console.log("Before:",group)
       return group;
     }
     function object3DToArrayBuffer(object3D){
-      var dracoExporter=new DRACOExporter();
+      let dracoExporter=new DRACOExporter();
 
       // 修改Object3D.toJSON，让其不处理Geometry
       function toJSON(object3D,meta){
 
         // meta is a string when called from JSON.stringify
-        const isRootObject = ( meta === undefined || typeof meta === 'string' );
+        let isRootObject = ( meta === undefined || typeof meta === 'string' );
 
-        const output = {};
+        let output = {};
 
         // meta is a hash used to collect geometries, materials.
         // not providing it implies that object3D is the root object
@@ -74,7 +75,7 @@
 
         // standard Object3D serialization
 
-        const object = {};
+        let object = {};
 
         object.uuid = object3D.uuid;
         object.type = object3D.type;
@@ -109,7 +110,7 @@
           if ( library[ element.uuid ] === undefined ) {
 
             //如果是Geometry则直接使用该Geometry，不使用toJSON
-            var value;
+            let value;
             if(element.type.match("Geometry")){
               value=element;
             }else{
@@ -127,17 +128,17 @@
 
           object.geometry = serialize( meta.geometries, object3D.geometry );
 
-          const parameters = object3D.geometry.parameters;
+          let parameters = object3D.geometry.parameters;
 
           if ( parameters !== undefined && parameters.shapes !== undefined ) {
 
-            const shapes = parameters.shapes;
+            let shapes = parameters.shapes;
 
             if ( Array.isArray( shapes ) ) {
 
-              for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+              for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
-                const shape = shapes[ i ];
+                let shape = shapes[ i ];
 
                 serialize( meta.shapes, shape );
 
@@ -172,9 +173,9 @@
 
           if ( Array.isArray( object3D.material ) ) {
 
-            const uuids = [];
+            let uuids = [];
 
-            for ( var i = 0, l = object3D.material.length; i < l; i ++ ) {
+            for ( let i = 0, l = object3D.material.length; i < l; i ++ ) {
 
               uuids.push( serialize( meta.materials, object3D.material[ i ] ) );
 
@@ -196,7 +197,7 @@
 
           object.children = [];
 
-          for ( var i = 0; i < object3D.children.length; i ++ ) {
+          for ( let i = 0; i < object3D.children.length; i ++ ) {
 
             object.children.push( toJSON( object3D.children[ i ],meta ).object );
 
@@ -210,9 +211,9 @@
 
           object.animations = [];
 
-          for ( var i = 0; i < object3D.animations.length; i ++ ) {
+          for ( let i = 0; i < object3D.animations.length; i ++ ) {
 
-            const animation = object3D.animations[ i ];
+            let animation = object3D.animations[ i ];
 
             object.animations.push( serialize( meta.animations, animation ) );
 
@@ -222,13 +223,13 @@
 
         if ( isRootObject ) {
 
-          const geometries = meta.geometries; // geometries不变
-          const materials = extractFromCache( meta.materials );
-          const textures = extractFromCache( meta.textures );
-          const images = extractFromCache( meta.images );
-          const shapes = extractFromCache( meta.shapes );
-          const skeletons = extractFromCache( meta.skeletons );
-          const animations = extractFromCache( meta.animations );
+          let geometries = meta.geometries; // geometries不变
+          let materials = extractFromCache( meta.materials );
+          let textures = extractFromCache( meta.textures );
+          let images = extractFromCache( meta.images );
+          let shapes = extractFromCache( meta.shapes );
+          let skeletons = extractFromCache( meta.skeletons );
+          let animations = extractFromCache( meta.animations );
 
           if ( Object.keys(geometries).length > 0 ) output.geometries = geometries;
           if ( materials.length > 0 ) output.materials = materials;
@@ -249,10 +250,10 @@
         // and return as array
         function extractFromCache( cache ) {
 
-          const values = [];
-          for ( const key in cache ) {
+          let values = [];
+          for ( let key in cache ) {
 
-            const data = cache[ key ];
+            let data = cache[ key ];
             delete data.metadata;
             values.push( data );
 
@@ -263,13 +264,13 @@
         }
 
       }
-      var json=toJSON(object3D);
+      let json=toJSON(object3D);
 
-      var geometries={};
-      var sumGeometryBuffersByteLength=0;
+      let geometries={};
+      let sumGeometryBuffersByteLength=0;
       for(let key in json.geometries){
         geometries[key]=dracoExporter.parse(json.geometries[key]); // TODO dracoExporter.parse占用大部分的时间
-        var byteLength=geometries[key].byteLength;
+        let byteLength=geometries[key].byteLength;
         let name=json.geometries[key].name;
         let userData=json.geometries[key].userData;
         json.geometries[key]={
@@ -289,10 +290,10 @@
 
         // javascript中string转UTF8格式byte数组_第三眼的思绪-CSDN博客: https://blog.csdn.net/a123638/article/details/46535239
         function str2UTF8(str){
-          var bytes = new Array();
-          var len,c;
+          let bytes = new Array();
+          let len,c;
           len = str.length;
-          for(var i = 0; i < len; i++){
+          for(let i = 0; i < len; i++){
             c = str.charCodeAt(i);
             if(c >= 0x010000 && c <= 0x10FFFF){
               bytes.push(((c >> 18) & 0x07) | 0xF0);
@@ -313,36 +314,36 @@
           return bytes;
         }
 
-        var buffer = new Uint8Array(str2UTF8(str)).buffer;
+        let buffer = new Uint8Array(str2UTF8(str)).buffer;
 
         return buffer;
 
       }
-      var jsonBuffer = stringToByteArray(JSON.stringify(json));
+      let jsonBuffer = stringToByteArray(JSON.stringify(json));
 
-      var outputDataBuffer = new ArrayBuffer(4 + jsonBuffer.byteLength + sumGeometryBuffersByteLength);
-      var modelDataSize = new Uint32Array(outputDataBuffer, 0, 1);
-      var modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
-      var modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
+      let outputDataBuffer = new ArrayBuffer(4 + jsonBuffer.byteLength + sumGeometryBuffersByteLength);
+      let modelDataSize = new Uint32Array(outputDataBuffer, 0, 1);
+      let modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
+      let modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
       modelDataSize[0] = jsonBuffer.byteLength;
       modelData.set(new Uint8Array(jsonBuffer));
-      for (var key in geometries) {
+      for (let key in geometries) {
         modelGeometries.set(geometries[key], json.geometries[key].offset);
       }
 
       return outputDataBuffer;
     }
     function arrayBufferToObject3D(arrayBuffer,onFinish){
-      var dracoLoader= new DRACOLoader();
+      let dracoLoader= new DRACOLoader();
 
-      var modelDataSize = (new Uint32Array(arrayBuffer, 0, 1))[0];
-      var modelData = new Uint8Array(arrayBuffer, 4, modelDataSize);
-      var json = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
+      let modelDataSize = (new Uint32Array(arrayBuffer, 0, 1))[0];
+      let modelData = new Uint8Array(arrayBuffer, 4, modelDataSize);
+      let json = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
 
-      var geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
-      var geometriesDataOffset = 4 + modelDataSize;
+      let geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
+      let geometriesDataOffset = 4 + modelDataSize;
 
-      var length=Object.keys(json.geometries).length;
+      let length=Object.keys(json.geometries).length;
       for (let key in json.geometries) {
         geometryBufferStart = geometriesDataOffset + json.geometries[key].offset;
         geometryBufferEnd = geometryBufferStart + json.geometries[key].byteLength;
@@ -358,37 +359,40 @@
           json.geometries[key]=geometry;
           ++finishCount;
           if (finishCount === length) {
+            let object3D=fromJSON(json);
+            console.log("After:",object3D);
+            dracoLoader.dispose();
             if(onFinish){
-              onFinish(fromJSON(json));
+              onFinish(object3D);
             }
           }
         });
 
-        var objectLoader=new THREE.ObjectLoader();
+        let objectLoader=new THREE.ObjectLoader();
         // 修改THREE.ObjectLoader.parse，让其不处理json.geometries
         function fromJSON( json, onLoad ) {
 
-          const animations = objectLoader.parseAnimations( json.animations );
-          const shapes = objectLoader.parseShapes( json.shapes );
+          let animations = objectLoader.parseAnimations( json.animations );
+          let shapes = objectLoader.parseShapes( json.shapes );
           function parseGeometries(json,shapes){
             if(!(Array.isArray(json))){
               return json;
             }
             return objectLoader.parseGeometries( json, shapes );
           }
-          const geometries = parseGeometries( json.geometries, shapes );
+          let geometries = parseGeometries( json.geometries, shapes );
 
-          const images = objectLoader.parseImages( json.images, function () {
+          let images = objectLoader.parseImages( json.images, function () {
 
             if ( onLoad !== undefined ) onLoad( object );
 
           } );
 
-          const textures = objectLoader.parseTextures( json.textures, images );
-          const materials = objectLoader.parseMaterials( json.materials, textures );
+          let textures = objectLoader.parseTextures( json.textures, images );
+          let materials = objectLoader.parseMaterials( json.materials, textures );
 
-          const object = objectLoader.parseObject( json.object, geometries, materials, animations );
-          const skeletons = objectLoader.parseSkeletons( json.skeletons, object );
+          let object = objectLoader.parseObject( json.object, geometries, materials, animations );
+          let skeletons = objectLoader.parseSkeletons( json.skeletons, object );
 
           objectLoader.bindSkeletons( object, skeletons );
 
@@ -396,9 +400,9 @@
 
           if ( onLoad !== undefined ) {
 
-            var hasImages = false;
+            let hasImages = false;
 
-            for ( const uuid in images ) {
+            for ( let uuid in images ) {
 
               if ( images[ uuid ] instanceof HTMLImageElement ) {
 
@@ -418,7 +422,7 @@
         }
       }
     }
-    arrayBufferToObject3D(object3DToArrayBuffer(createModels()),console.log);
+    arrayBufferToObject3D(object3DToArrayBuffer(createModels()));
     return output;
   }
   window.app=init();
