@@ -41055,10 +41055,6 @@ class ObjectLoader extends Loader {
 
 	parseGeometries( json, shapes ) {
 
-		if(!(Array.isArray(json))){
-			return json;
-		}
-
 		const geometries = {};
 		let geometryShapes;
 

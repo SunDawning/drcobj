@@ -1,21 +1,20 @@
 <script type="text/javascript" src="./src/vendor/draco_encoder.js"></script>
 <script type="module">
   import * as THREE from "./three.module.js";
-  import {DrcobjExporter} from "./DrcobjExporter.module.js";
-  import {DrcobjLoader} from "./DrcobjLoader.module.js";
+  import {DRACOExporter} from "./DRACOExporter.module.js";
+  import {DRACOLoader} from "./DRACOLoader.module.js";
   function init(){
-    let output={};
+    var output={};
     output.THREE=THREE;
-    output.DrcobjExporter=DrcobjExporter;
     function createMesh(){
       const geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array( [
-        -1.0, -1.0,  1.0,
+                                                                          -1.0, -1.0,  1.0,
         1.0, -1.0,  1.0,
         1.0,  1.0,  1.0,
         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0, -1.0,  1.0
+                                                                          -1.0,  1.0,  1.0,
+                                                                          -1.0, -1.0,  1.0
       ] );
       geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
       const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -26,19 +25,386 @@
       return mesh;
     }
     function createModels(){
-      let group=new THREE.Group();
+      var group=new THREE.Group();
       group.name="组";
-      let mesh=createMesh();
-      for(let c=0;c<Math.pow(10,5);c++){
+      var mesh=createMesh();
+      for(var c=0;c<Math.pow(10,2);c++){
         group.add(mesh.clone());
       }
       return group;
     }
-    let loader=new DrcobjLoader();
-    loader.parse(new DrcobjExporter().parse(createModels().toJSON()),function(object){
-      loader.dispose();
-      console.log(object.children.length);
-    });
+    function object3DToArrayBuffer(object3D){
+      var dracoExporter=new DRACOExporter();
+
+      // 修改Object3D.toJSON，让其不处理Geometry
+      function toJSON(object3D,meta){
+
+        // meta is a string when called from JSON.stringify
+        const isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+        const output = {};
+
+        // meta is a hash used to collect geometries, materials.
+        // not providing it implies that object3D is the root object
+        // being serialized.
+        if ( isRootObject ) {
+
+          // initialize meta obj
+          meta = {
+            geometries: {},
+            materials: {},
+            textures: {},
+            images: {},
+            shapes: {},
+            skeletons: {},
+            animations: {}
+          };
+
+          output.metadata = {
+            version: 4.5,
+            type: 'Object',
+            generator: 'Object3D.toJSON'
+          };
+
+        }
+
+        // standard Object3D serialization
+
+        const object = {};
+
+        object.uuid = object3D.uuid;
+        object.type = object3D.type;
+
+        if ( object3D.name !== '' ) object.name = object3D.name;
+        if ( object3D.castShadow === true ) object.castShadow = true;
+        if ( object3D.receiveShadow === true ) object.receiveShadow = true;
+        if ( object3D.visible === false ) object.visible = false;
+        if ( object3D.frustumCulled === false ) object.frustumCulled = false;
+        if ( object3D.renderOrder !== 0 ) object.renderOrder = object3D.renderOrder;
+        if ( JSON.stringify( object3D.userData ) !== '{}' ) object.userData = object3D.userData;
+
+        object.layers = object3D.layers.mask;
+        object.matrix = object3D.matrix.toArray();
+
+        if ( object3D.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+        // object specific properties
+
+        if ( object3D.isInstancedMesh ) {
+
+          object.type = 'InstancedMesh';
+          object.count = object3D.count;
+          object.instanceMatrix = object3D.instanceMatrix.toJSON();
+
+        }
+
+        //
+
+        function serialize( library, element ) {
+
+          if ( library[ element.uuid ] === undefined ) {
+
+            //如果是Geometry则直接使用该Geometry，不使用toJSON
+            var value;
+            if(element.type.match("Geometry")){
+              value=element;
+            }else{
+              value=element.toJSON( meta );
+            }
+            library[ element.uuid ] = value;
+
+          }
+
+          return element.uuid;
+
+        }
+
+        if ( object3D.isMesh || object3D.isLine || object3D.isPoints ) {
+
+          object.geometry = serialize( meta.geometries, object3D.geometry );
+
+          const parameters = object3D.geometry.parameters;
+
+          if ( parameters !== undefined && parameters.shapes !== undefined ) {
+
+            const shapes = parameters.shapes;
+
+            if ( Array.isArray( shapes ) ) {
+
+              for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+                const shape = shapes[ i ];
+
+                serialize( meta.shapes, shape );
+
+              }
+
+            } else {
+
+              serialize( meta.shapes, shapes );
+
+            }
+
+          }
+
+        }
+
+        if ( object3D.isSkinnedMesh ) {
+
+          object.bindMode = object3D.bindMode;
+          object.bindMatrix = object3D.bindMatrix.toArray();
+
+          if ( object3D.skeleton !== undefined ) {
+
+            serialize( meta.skeletons, object3D.skeleton );
+
+            object.skeleton = object3D.skeleton.uuid;
+
+          }
+
+        }
+
+        if ( object3D.material !== undefined ) {
+
+          if ( Array.isArray( object3D.material ) ) {
+
+            const uuids = [];
+
+            for ( var i = 0, l = object3D.material.length; i < l; i ++ ) {
+
+              uuids.push( serialize( meta.materials, object3D.material[ i ] ) );
+
+            }
+
+            object.material = uuids;
+
+          } else {
+
+            object.material = serialize( meta.materials, object3D.material );
+
+          }
+
+        }
+
+        //
+
+        if ( object3D.children.length > 0 ) {
+
+          object.children = [];
+
+          for ( var i = 0; i < object3D.children.length; i ++ ) {
+
+            object.children.push( toJSON( object3D.children[ i ],meta ).object );
+
+          }
+
+        }
+
+        //
+
+        if ( object3D.animations.length > 0 ) {
+
+          object.animations = [];
+
+          for ( var i = 0; i < object3D.animations.length; i ++ ) {
+
+            const animation = object3D.animations[ i ];
+
+            object.animations.push( serialize( meta.animations, animation ) );
+
+          }
+
+        }
+
+        if ( isRootObject ) {
+
+          const geometries = meta.geometries; // geometries不变
+          const materials = extractFromCache( meta.materials );
+          const textures = extractFromCache( meta.textures );
+          const images = extractFromCache( meta.images );
+          const shapes = extractFromCache( meta.shapes );
+          const skeletons = extractFromCache( meta.skeletons );
+          const animations = extractFromCache( meta.animations );
+
+          if ( Object.keys(geometries).length > 0 ) output.geometries = geometries;
+          if ( materials.length > 0 ) output.materials = materials;
+          if ( textures.length > 0 ) output.textures = textures;
+          if ( images.length > 0 ) output.images = images;
+          if ( shapes.length > 0 ) output.shapes = shapes;
+          if ( skeletons.length > 0 ) output.skeletons = skeletons;
+          if ( animations.length > 0 ) output.animations = animations;
+
+        }
+
+        output.object = object;
+
+        return output;
+
+        // extract data from the cache hash
+        // remove metadata on each item
+        // and return as array
+        function extractFromCache( cache ) {
+
+          const values = [];
+          for ( const key in cache ) {
+
+            const data = cache[ key ];
+            delete data.metadata;
+            values.push( data );
+
+          }
+
+          return values;
+
+        }
+
+      }
+      var json=toJSON(object3D);
+
+      var geometries={};
+      var sumGeometryBuffersByteLength=0;
+      for(var key in json.geometries){
+        geometries[key]=dracoExporter.parse(json.geometries[key]);
+        var byteLength=geometries[key].byteLength;
+        json.geometries[key]={
+          offset:sumGeometryBuffersByteLength,
+          byteLength:byteLength
+        };
+        sumGeometryBuffersByteLength=sumGeometryBuffersByteLength+byteLength;
+      }
+
+      function stringToByteArray(str) {
+
+        // javascript中string转UTF8格式byte数组_第三眼的思绪-CSDN博客: https://blog.csdn.net/a123638/article/details/46535239
+        function str2UTF8(str){
+          var bytes = new Array();
+          var len,c;
+          len = str.length;
+          for(var i = 0; i < len; i++){
+            c = str.charCodeAt(i);
+            if(c >= 0x010000 && c <= 0x10FFFF){
+              bytes.push(((c >> 18) & 0x07) | 0xF0);
+              bytes.push(((c >> 12) & 0x3F) | 0x80);
+              bytes.push(((c >> 6) & 0x3F) | 0x80);
+              bytes.push((c & 0x3F) | 0x80);
+            }else if(c >= 0x000800 && c <= 0x00FFFF){
+              bytes.push(((c >> 12) & 0x0F) | 0xE0);
+              bytes.push(((c >> 6) & 0x3F) | 0x80);
+              bytes.push((c & 0x3F) | 0x80);
+            }else if(c >= 0x000080 && c <= 0x0007FF){
+              bytes.push(((c >> 6) & 0x1F) | 0xC0);
+              bytes.push((c & 0x3F) | 0x80);
+            }else{
+              bytes.push(c & 0xFF);
+            }
+          }
+          return bytes;
+        }
+
+        var buffer = new Uint8Array(str2UTF8(str)).buffer;
+
+        return buffer;
+
+      }
+      var jsonBuffer = stringToByteArray(JSON.stringify(json));
+
+      var outputDataBuffer = new ArrayBuffer(4 + jsonBuffer.byteLength + sumGeometryBuffersByteLength);
+      var modelDataSize = new Uint32Array(outputDataBuffer, 0, 1);
+      var modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
+      var modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
+      modelDataSize[0] = jsonBuffer.byteLength;
+      modelData.set(new Uint8Array(jsonBuffer));
+      var offset=0;
+      for (var key in geometries) {
+        modelGeometries.set(geometries[key], offset);
+        offset += geometries[key].byteLength;
+      }
+      console.log(geometries)
+      
+      return outputDataBuffer;
+    }
+    function arrayBufferToObject3D(arrayBuffer,onFinish){
+      var dracoLoader= new DRACOLoader();
+
+      var modelDataSize = (new Uint32Array(arrayBuffer, 0, 1))[0];
+      var modelData = new Uint8Array(arrayBuffer, 4, modelDataSize);
+      var json = JSON.parse(THREE.LoaderUtils.decodeText(modelData));
+
+      var geometryBufferStart, geometryBufferEnd, geometryBuffer, finishCount = 0;
+      var geometriesDataOffset = 4 + modelDataSize;
+
+      var length=Object.keys(json.geometries).length;
+      for (var key in json.geometries) {
+        geometryBufferStart = geometriesDataOffset + json.geometries[key].offset;
+        geometryBufferEnd = geometryBufferStart + json.geometries[key].byteLength;
+        geometryBuffer = arrayBuffer.slice(geometryBufferStart, geometryBufferEnd);
+        dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
+          json.geometries[key]=null;
+          geometry.uuid=key;
+          json.geometries[key]=geometry;
+          ++finishCount;
+          if (finishCount === length) {
+            if(onFinish){
+              onFinish(fromJSON(json));
+            }
+          }
+        });
+        
+        var objectLoader=new THREE.ObjectLoader();
+        // 修改THREE.ObjectLoader.parse，让其不处理json.geometries
+        function fromJSON( json, onLoad ) {
+
+          const animations = objectLoader.parseAnimations( json.animations );
+          const shapes = objectLoader.parseShapes( json.shapes );
+          function parseGeometries(json,shapes){
+            if(!(Array.isArray(json))){
+              return json;
+            }
+            return objectLoader.parseGeometries( json, shapes );
+          }
+          const geometries = parseGeometries( json.geometries, shapes );
+
+          const images = objectLoader.parseImages( json.images, function () {
+
+            if ( onLoad !== undefined ) onLoad( object );
+
+          } );
+
+          const textures = objectLoader.parseTextures( json.textures, images );
+          const materials = objectLoader.parseMaterials( json.materials, textures );
+
+          const object = objectLoader.parseObject( json.object, geometries, materials, animations );
+          const skeletons = objectLoader.parseSkeletons( json.skeletons, object );
+
+          objectLoader.bindSkeletons( object, skeletons );
+
+          //
+
+          if ( onLoad !== undefined ) {
+
+            var hasImages = false;
+
+            for ( const uuid in images ) {
+
+              if ( images[ uuid ] instanceof HTMLImageElement ) {
+
+                hasImages = true;
+                break;
+
+              }
+
+            }
+
+            if ( hasImages === false ) onLoad( object );
+
+          }
+
+          return object;
+
+        }
+      }
+    }
+    arrayBufferToObject3D(object3DToArrayBuffer(createModels()),console.log);
     return output;
   }
   window.app=init();
