@@ -8,14 +8,7 @@
     let output={};
     function createMesh(){
       let geometry = new THREE.BufferGeometry();
-      let vertices = new Float32Array( [
-                                                                        -1.0, -1.0,  1.0,
-        1.0, -1.0,  1.0,
-        1.0,  1.0,  1.0,
-        1.0,  1.0,  1.0,
-                                                                        -1.0,  1.0,  1.0,
-                                                                        -1.0, -1.0,  1.0
-      ] );
+      let vertices = new Float32Array( [-1.0, -1.0,  1.0, 1.0, -1.0,  1.0, 1.0,  1.0,  1.0, 1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0] );
       geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
       let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
       let mesh = new THREE.Mesh( geometry, material );
@@ -28,7 +21,7 @@
       let group=new THREE.Group();
       group.name="组";
       let mesh=createMesh();
-      for(let c=0;c<Math.pow(10,3);c++){
+      for(let c=0;c<Math.pow(10,1);c++){
         let geometry=mesh.geometry.clone();
         geometry.name=geometry.name+c;
         let meshClone= new THREE.Mesh(geometry,mesh.material);
@@ -433,11 +426,11 @@
       var link = document.createElement( 'a' );
       function save( blob, filename ) {
 
-	link.href = URL.createObjectURL( blob );
-	link.download = filename || 'data.json';
-	link.dispatchEvent( new MouseEvent( 'click' ) );
+        link.href = URL.createObjectURL( blob );
+        link.download = filename || 'data.json';
+        link.dispatchEvent( new MouseEvent( 'click' ) );
 
-	// URL.revokeObjectURL( url ); breaks Firefox...
+        // URL.revokeObjectURL( url ); breaks Firefox...
 
       }
       console.log(buffer);
@@ -455,6 +448,37 @@
       saveArrayBuffer(buffer,zlibFileName);
       console.log("Zlib Duratiion:",new Date().getTime()-startTime);
     }
+    // 如果服务器在线的话，并且服务器不存在文件rawFileName，则创建该文件，否则直接加载
+    function loadOrGenerateFile(){
+      let rawFileName="sceneAuto.drcobj";
+      function head(url,on404,on200){
+        let request=new XMLHttpRequest();
+        request["onreadystatechange"]=function(event){
+          if(request["readyState"]===4){
+            switch(request["status"]){
+              case 200:
+                if(on200){on200();}
+                break;
+              case 404:
+                if(on404){on404();}
+                break;
+            }
+          }
+        }
+        request.open("HEAD",url,true);
+        request.send(null);
+      }
+      head("/ping",null,function(){
+        head("/"+rawFileName,function(){
+          let xhr=new XMLHttpRequest();
+          xhr.open("POST","/upload?fileName="+rawFileName,true);
+          xhr.send(object3DToArrayBuffer(createModels()));
+        },function(){
+          loadFile(rawFileName);
+        });
+      });
+    };
+    loadOrGenerateFile();    
     function loadFile(url,onLoad){
       let startTime=new Date().getTime();
       let fileLoader=new THREE.FileLoader();

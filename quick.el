@@ -1,0 +1,12 @@
+(defservlet ping "application/json" (path)
+  (insert "{}"))
+(defservlet upload "application/json" (path))
+(defun httpd/upload (proc _path _query req &rest arg)
+  (let ((coding-system-for-write (quote raw-text)))
+    (let ((string (cadr (assoc "Content" req))))
+      (message "%S" (type-of _query))
+      (let ((file (or (car (alist-get "fileName" _query nil nil (function equal)))
+                      "scene.drcobj")))
+        (when (> (length string) 0)
+          (write-region string
+                        nil (expand-file-name (concat "~/.emacs.d/site-lisp/drcobj/" file))))))))
