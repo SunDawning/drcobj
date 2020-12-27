@@ -39,7 +39,7 @@
       console.log("Before:",group)
       return group;
     }
-    /* 返回值的数据格式里依次是：空白标记、JSON字符串和一些经过DRACO压缩处理的几何体geometries。
+    /* 返回值的数据格式里依次是：以Uint32存储的JSON字符串的byteLength长度、以Uint8存储的JSON字符串和以Int8存储的一些经过DRACO压缩处理的几何体geometries。
      * JSON字符串里也有geometries，只是其中保存的是经过DRACO处理的几何体的位置、名称及用户数据，便于解压后还原数据。 */
     function object3DToArrayBuffer(object3D){
       let dracoExporter=new DRACOExporter();
@@ -329,10 +329,10 @@
 
       let outputDataBuffer = new ArrayBuffer(4 + jsonBuffer.byteLength + sumGeometryBuffersByteLength);
       let modelDataSize = new Uint32Array(outputDataBuffer, 0, 1);
-      let modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
-      let modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
       modelDataSize[0] = jsonBuffer.byteLength;
+      let modelData = new Uint8Array(outputDataBuffer, 4, jsonBuffer.byteLength);
       modelData.set(new Uint8Array(jsonBuffer));
+      let modelGeometries = new Int8Array(outputDataBuffer, 4 + jsonBuffer.byteLength, sumGeometryBuffersByteLength);
       for (let key in geometries) {
         modelGeometries.set(geometries[key], json.geometries[key].offset);
       }
