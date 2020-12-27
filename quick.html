@@ -268,13 +268,20 @@
       var geometries={};
       var sumGeometryBuffersByteLength=0;
       for(let key in json.geometries){
-        geometries[key]=dracoExporter.parse(json.geometries[key]);
+        geometries[key]=dracoExporter.parse(json.geometries[key]); // TODO dracoExporter.parse占用大部分的时间
         var byteLength=geometries[key].byteLength;
+        let name=json.geometries[key].name;
+        let userData=json.geometries[key].userData;
         json.geometries[key]={
           offset:sumGeometryBuffersByteLength,
           byteLength:byteLength,
-          name:json.geometries[key].name
         };
+        if(name&&name.length>0){
+          json.geometries[key].name=name;
+        }
+        if(userData&&Object.keys(userData).length>0){
+          json.geometries[key].userData=userData
+        }
         sumGeometryBuffersByteLength=sumGeometryBuffersByteLength+byteLength;
       }
 
@@ -342,7 +349,12 @@
         geometryBuffer = arrayBuffer.slice(geometryBufferStart, geometryBufferEnd);
         dracoLoader.decodeDracoFile(geometryBuffer, function (geometry) {
           geometry.uuid=key;
-          geometry.name=json.geometries[key].name;
+          if(json.geometries[key].name){
+            geometry.name=json.geometries[key].name;
+          }
+          if(json.geometries[key].userData){
+            geometry.userData=json.geometries[key].userData;
+          }
           json.geometries[key]=geometry;
           ++finishCount;
           if (finishCount === length) {
