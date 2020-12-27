@@ -5,7 +5,6 @@
   import {DRACOLoader} from "./DRACOLoader.module.js";
   function init(){
     let output={};
-    output.THREE=THREE;
     function createMesh(){
       let geometry = new THREE.BufferGeometry();
       let vertices = new Float32Array( [
@@ -430,7 +429,32 @@
         }
       }
     }
-    arrayBufferToObject3D(object3DToArrayBuffer(createModels()));
+    function saveArrayBuffer(buffer,filename){
+      var link = document.createElement( 'a' );
+      function save( blob, filename ) {
+
+	link.href = URL.createObjectURL( blob );
+	link.download = filename || 'data.json';
+	link.dispatchEvent( new MouseEvent( 'click' ) );
+
+	// URL.revokeObjectURL( url ); breaks Firefox...
+
+      }
+      save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+    };
+    output.export=function(){
+      saveArrayBuffer(object3DToArrayBuffer(createModels()),"scene.drcobj");
+    }
+    function loadFile(url){
+      let fileLoader=new THREE.FileLoader();
+      fileLoader.setResponseType("arraybuffer");
+      fileLoader.load(url,function(buffer){
+        arrayBufferToObject3D(buffer);
+      });
+    };
+    output.import=function(){
+      loadFile("scene.drcobj");
+    }
     return output;
   }
   window.app=init();
