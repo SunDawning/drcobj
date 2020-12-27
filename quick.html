@@ -467,6 +467,7 @@
         arrayBufferToObject3D(buffer);
       });
     };
+    // 在本地测试的时候尽管数据很大但也不必使用zlib，其压缩和解压的时间明显较长，如果远程加载数据的时间太长，不妨尝试先进行zlib压缩再传输。
     output.import=function(){
       loadFile(rawFileName);
       loadFile(zlibFileName,function(buffer){
